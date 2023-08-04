@@ -61,15 +61,18 @@ class QuantumGen:
 
     @staticmethod
     def generate(self):
+        """Generating a random bit by simulating the operation of a three-qubit quantum computer"""
         initial_state = np.array([1] + [0] * 7)  # create an initial state ( "|000⟩" )
         superposition_state = self.apply(initial_state, self.identity_gate(), self.hadamard_gate(), self.identity_gate())  # convert the 2nd qubit into superposition
         flipped_first_bit_state = self.apply(superposition_state, self.pauli_x_gate(), self.identity_gate(), self.identity_gate())  # change 1-th bit to 1 using the X-gate
         controlled_operation_result = self.apply(flipped_first_bit_state, self.controlled_x_gate(), self.identity_gate())  # confuse the 1st and 2nd cubits
         swapped_qubits_state = self.apply(controlled_operation_result, self.identity_gate(), self.swap_gate())  # swap the 2nd and 3rd cubits
         result = self.observe(swapped_qubits_state)  # observe qubits state
+
         return result
 
     def generate_password(self):
+        """password generation"""
         password = ''
         while len(password) != self.length:
             random_number = int(''.join(['1' if self.generate(self) != 1 else '0' for _ in range(8)]), base=2)
@@ -79,6 +82,7 @@ class QuantumGen:
         return password
 
     def check_password_strength(self):
+        """checking password strength against brute force attacks offline"""
         bruteforce_speed_per_second = 1000000  # Estimated password brute force speed
         password_complexity = len(self.character_set) ** self.length  # possible number of password combinations
         time_estimate = password_complexity / bruteforce_speed_per_second  # bruteforce password cracking time
